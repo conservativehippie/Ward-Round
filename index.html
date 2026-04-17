@@ -1,390 +1,927 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="theme-color" content="#f5f7fb" />
-<title>Ward Jobs</title>
-<style>
-:root{
-  --bg:#f5f7fb;
-  --panel:#ffffff;
-  --line:#e7ebf3;
-  --text:#18202f;
-  --muted:#6d7890;
-  --accent:#3f7cff;
-  --accent-soft:#edf3ff;
-  --green:#1f9d63;
-  --green-soft:#eaf8f1;
-  --red:#d84d4d;
-  --red-soft:#fff0f0;
-  --amber:#b7791f;
-  --amber-soft:#fff7e8;
-  --shadow:0 8px 24px rgba(23,33,61,.06);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="WardFlow - fast bed-based ward task organizer for interns. Local-first, privacy-preserving, installable." />
+  <title>WardFlow</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <style>
+:root {
+  --bg: #f3f6fb;
+  --panel: #ffffff;
+  --panel-2: #f8fafc;
+  --text: #0f172a;
+  --muted: #5b6472;
+  --border: #dbe2ea;
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  --critical: #b91c1c;
+  --urgent: #d97706;
+  --soon: #2563eb;
+  --routine: #475569;
+  --done: #15803d;
+  --waiting: #7c3aed;
+  --accent: #0f172a;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:none}
-input,select,textarea{width:100%;border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:#fff;color:var(--text);outline:none}
-textarea{min-height:88px;resize:vertical}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(63,124,255,.08)}
-.app{max-width:1180px;margin:0 auto;padding:18px 16px 110px}
-.top{position:sticky;top:0;z-index:20;background:rgba(245,247,251,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top-inner{max-width:1180px;margin:0 auto;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
-.brand{font-size:24px;font-weight:800;letter-spacing:-.03em}
-.sub{font-size:13px;color:var(--muted)}
-.notice{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;color:var(--muted);line-height:1.45;box-shadow:var(--shadow)}
-.notice strong{color:var(--text)}
-.layout{display:grid;grid-template-columns:330px 1fr;gap:18px;margin-top:18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
-.card-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
-.card-body{padding:16px 18px}
-.stack{display:grid;gap:12px}
-.row{display:flex;gap:10px;align-items:center}
-.wrap{flex-wrap:wrap}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn{padding:12px 14px;border-radius:14px;font-weight:700;background:#fff;border:1px solid var(--line);color:var(--text)}
-.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.btn.soft{background:var(--accent-soft);color:var(--accent);border-color:transparent}
-.btn.danger{background:var(--red-soft);color:var(--red);border-color:transparent}
-.statbar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}
-.stat-num{font-size:28px;font-weight:800;letter-spacing:-.03em}
-.stat-lbl{font-size:12px;color:var(--muted)}
-.search{margin-bottom:10px}
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
-.filter{padding:8px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:700;color:var(--muted)}
-.filter.active{background:var(--accent-soft);color:var(--accent);border-color:transparent}
-.patient{padding:14px;border:1px solid var(--line);border-radius:18px;background:#fff;display:grid;gap:8px;cursor:pointer;transition:.15s}
-.patient.active{border-color:rgba(63,124,255,.35);background:#fafdff;box-shadow:0 0 0 3px rgba(63,124,255,.06)}
-.patient-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.patient-name{font-size:17px;font-weight:800;letter-spacing:-.02em}
-.patient-meta{font-size:13px;color:var(--muted)}
-.chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{padding:5px 9px;border-radius:999px;font-size:11px;font-weight:800}
-.chip.blue{background:var(--accent-soft);color:var(--accent)}
-.chip.green{background:var(--green-soft);color:var(--green)}
-.chip.red{background:var(--red-soft);color:var(--red)}
-.chip.amber{background:var(--amber-soft);color:var(--amber)}
-.empty{padding:34px 16px;text-align:center;color:var(--muted)}
-.hero{display:grid;gap:14px}
-.hero-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.hero-name{font-size:28px;font-weight:900;letter-spacing:-.04em}
-.hero-sub{font-size:14px;color:var(--muted)}
-.section-title{font-size:15px;font-weight:800;margin-bottom:8px}
-.summary-box{padding:16px;border:1px solid var(--line);border-radius:18px;background:#fbfcff}
-.list{display:grid;gap:10px}
-.job{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:18px;background:#fff}
-.job.urgent{background:var(--red-soft);border-color:#ffd4d4}
-.job.done{opacity:.55}
-.tick{width:24px;height:24px;border-radius:8px;border:2px solid #c8d1e3;background:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:900}
-.tick.done{background:var(--green);border-color:var(--green);color:#fff}
-.job-main{flex:1;min-width:0}
-.job-text{font-weight:700;line-height:1.35}
-.job-meta{font-size:12px;color:var(--muted);margin-top:4px}
-.job-actions{display:flex;gap:8px;flex-wrap:wrap}
-.linkish{background:none;padding:0;color:var(--muted);font-weight:700}
-.linkish.red{color:var(--red)}
-.quick-jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
-.quick{padding:11px 12px;border-radius:14px;background:#fff;border:1px solid var(--line);text-align:left;font-weight:700;color:#2a3550}
-.footerbar{position:fixed;left:0;right:0;bottom:0;background:rgba(245,247,251,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:22}
-.footer-inner{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;flex-wrap:wrap}
-.modal-wrap{position:fixed;inset:0;background:rgba(18,26,44,.28);display:none;align-items:flex-end;justify-content:center;padding:12px;z-index:30}
-.modal-wrap.show{display:flex}
-.modal{width:min(700px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;border:1px solid var(--line);box-shadow:0 20px 60px rgba(20,28,50,.18);padding:20px}
-.small{font-size:12px;color:var(--muted)}
-@media (max-width:920px){
-  .layout{grid-template-columns:1fr}
-  .hero-name{font-size:24px}
-  .statbar{grid-template-columns:1fr 1fr 1fr}
+html[data-theme="dark"] {
+  --bg: #0b1220;
+  --panel: #111827;
+  --panel-2: #172133;
+  --text: #e5eef8;
+  --muted: #9aa7b8;
+  --border: #243247;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --routine: #94a3b8;
+  --accent: #dbe7f6;
 }
-@media (max-width:640px){
-  .top-inner{align-items:flex-start;flex-direction:column}
-  .grid-2,.statbar{grid-template-columns:1fr}
-  .hero-top{flex-direction:column}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
 }
-</style>
+button, input, select, textarea { font: inherit; }
+#app { max-width: 1400px; margin: 0 auto; padding: 12px; }
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+.topbar, .quick-panel, .toolbar { padding: 14px; }
+.brand-wrap { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+h1 { margin: 0; font-size: 1.5rem; }
+.subline, .muted, .fine-print { color: var(--muted); font-size: 0.92rem; }
+.safety-banner {
+  margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+  background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.32);
+  color: var(--text); font-weight: 700;
+}
+.fine-print { margin-top: 8px; }
+.layout { display: grid; gap: 12px; margin-top: 12px; }
+.quick-add-row { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+#quickInput, .search-input, select, textarea, .dialog-grid input {
+  width: 100%; padding: 14px 14px; border-radius: 14px; border: 1px solid var(--border);
+  background: var(--panel-2); color: var(--text);
+}
+#quickInput { font-size: 1rem; }
+.primary-btn, .ghost-btn, .chip, .template-chip {
+  border-radius: 14px; border: 1px solid var(--border); padding: 12px 14px; cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.primary-btn { background: var(--accent); color: var(--bg); font-weight: 700; }
+.ghost-btn, .chip, .template-chip { background: var(--panel-2); color: var(--text); }
+button:active { transform: translateY(1px) scale(0.99); }
+.parse-hint { margin-top: 8px; color: var(--muted); font-size: 0.9rem; min-height: 1.25rem; }
+.template-row, .chip-group {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+}
+.template-chip { padding: 8px 12px; font-size: 0.92rem; }
+.overview-grid { display: grid; gap: 12px; grid-template-columns: 1.1fr 0.9fr; }
+.next-card, .counts-card { padding: 14px; }
+.section-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.section-head h2 { margin: 0; font-size: 1.1rem; }
+.next-list { display: grid; gap: 8px; }
+.next-item {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center;
+  padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel-2);
+}
+.next-item .bed-badge, .bed-badge {
+  min-width: 60px; text-align: center; font-weight: 800; padding: 8px 10px;
+  border-radius: 999px; background: rgba(37, 99, 235, 0.12); color: #1d4ed8;
+}
+html[data-theme="dark"] .next-item .bed-badge, html[data-theme="dark"] .bed-badge { color: #93c5fd; }
+.counts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.count-box {
+  padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel-2);
+}
+.count-box .num { font-size: 1.4rem; font-weight: 800; }
+.toolbar { padding: 12px; }
+.toolbar-row { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; align-items: center; }
+.toolbar-row-bottom { margin-top: 10px; }
+.chip.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.task-area { display: grid; gap: 12px; }
+.group-card { padding: 10px; }
+.group-title { margin: 0 0 10px 0; font-size: 1rem; }
+.task-list { display: grid; gap: 10px; }
+.task-card {
+  border: 1px solid var(--border); background: var(--panel); border-radius: 16px; padding: 12px;
+  display: grid; gap: 10px; border-left: 6px solid var(--routine);
+}
+.task-card.priority-critical { border-left-color: var(--critical); }
+.task-card.priority-urgent { border-left-color: var(--urgent); }
+.task-card.priority-soon { border-left-color: var(--soon); }
+.task-card.priority-routine { border-left-color: var(--routine); }
+.task-card.done { opacity: 0.8; border-left-color: var(--done); }
+.task-card.overdue { box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.18); }
+.task-top { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; }
+.check-wrap { display: flex; align-items: center; justify-content: center; }
+.task-check {
+  width: 24px; height: 24px; accent-color: var(--done); cursor: pointer;
+}
+.task-main { min-width: 0; }
+.task-title { font-size: 1rem; font-weight: 700; margin: 0 0 4px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.task-meta, .task-times, .task-note { color: var(--muted); font-size: 0.88rem; }
+.pill {
+  display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; font-size: 0.78rem;
+  border: 1px solid var(--border); background: var(--panel-2); font-weight: 700;
+}
+.p-critical { color: var(--critical); }
+.p-urgent { color: var(--urgent); }
+.p-soon { color: var(--soon); }
+.p-routine { color: var(--routine); }
+.p-done { color: var(--done); }
+.p-waiting { color: var(--waiting); }
+.task-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.mini-btn {
+  padding: 8px 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer;
+}
+.status-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.task-dialog {
+  width: min(720px, calc(100vw - 24px)); border: none; border-radius: 18px; padding: 0;
+  background: var(--panel); color: var(--text); box-shadow: var(--shadow);
+}
+.task-dialog::backdrop { background: rgba(15, 23, 42, 0.5); }
+.dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 14px 0 14px; }
+.dialog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 14px; }
+.dialog-grid label { display: grid; gap: 6px; font-weight: 600; }
+.dialog-grid .full { grid-column: 1 / -1; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 0 14px 14px 14px; }
+.toast {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(20px);
+  background: var(--accent); color: var(--bg); padding: 10px 14px; border-radius: 999px;
+  opacity: 0; pointer-events: none; transition: all 0.2s ease; z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.sticky-top { position: sticky; top: 0; z-index: 20; }
+.sticky-add { position: sticky; top: 126px; z-index: 19; }
+@media (max-width: 960px) {
+  .overview-grid { grid-template-columns: 1fr; }
+  .sticky-add { position: sticky; top: 152px; }
+}
+@media (max-width: 760px) {
+  #app { padding: 10px; }
+  .quick-add-row { grid-template-columns: 1fr auto auto; }
+  .dialog-grid { grid-template-columns: 1fr; }
+  .counts-grid { grid-template-columns: repeat(2, 1fr); }
+  .task-top { grid-template-columns: auto 1fr; }
+  .task-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .sticky-top { top: 0; }
+  .sticky-add { top: 148px; }
+}
+  </style>
 </head>
 <body>
-<div class="top">
-  <div class="top-inner">
-    <div>
-      <div class="brand">Ward Jobs</div>
-      <div class="sub">Minimal tracker for Gen Med rounds</div>
+  <div id="app">
+    <header class="topbar card sticky-top">
+      <div class="brand-wrap">
+        <div>
+          <h1>WardFlow</h1>
+          <div class="subline" id="dateTime"></div>
+        </div>
+        <div class="top-actions">
+          <button id="themeToggle" class="ghost-btn" title="Toggle dark mode" aria-label="Toggle dark mode">◐</button>
+        </div>
+      </div>
+      <div class="safety-banner">Do not enter identifying patient information</div>
+      <div class="fine-print">Task organization only. Prioritization assistance is organizational, not medical advice.</div>
+    </header>
+
+    <main class="layout">
+      <section class="quick-panel card sticky-add">
+        <div class="quick-add-row">
+          <input id="quickInput" type="text" placeholder="e.g. Bed 12 bloods, Bed 7 discharge summary, Bed 4 chase CT" autocomplete="off" spellcheck="false" />
+          <button id="voiceBtn" class="ghost-btn" title="Voice input" aria-label="Voice input">🎤</button>
+          <button id="addBtn" class="primary-btn">Add</button>
+        </div>
+        <div id="parseHint" class="parse-hint">Type naturally. WardFlow will suggest bed, category, and priority.</div>
+        <div class="template-row" id="templateRow"></div>
+      </section>
+
+      <section class="overview-grid">
+        <div class="card next-card">
+          <div class="section-head">
+            <h2>Next 5</h2>
+            <span class="muted">Top actionable tasks</span>
+          </div>
+          <div id="nextFive" class="next-list"></div>
+        </div>
+
+        <div class="card counts-card">
+          <div class="section-head">
+            <h2>Today</h2>
+            <span class="muted">Live counts</span>
+          </div>
+          <div class="counts-grid" id="countsGrid"></div>
+        </div>
+      </section>
+
+      <section class="toolbar card">
+        <div class="toolbar-row">
+          <div class="chip-group" id="statusFilters"></div>
+          <div class="chip-group" id="viewModes"></div>
+        </div>
+        <div class="toolbar-row toolbar-row-bottom">
+          <input id="searchInput" class="search-input" type="text" placeholder="Search by bed or task" />
+          <select id="sortMode">
+            <option value="priority-newest">Priority then newest</option>
+            <option value="priority-oldest">Priority then oldest</option>
+            <option value="bed">Bed number</option>
+            <option value="updated">Recently updated</option>
+          </select>
+          <button id="handoverBtn" class="ghost-btn">Handover summary</button>
+          <button id="clearDoneBtn" class="ghost-btn">Clear done</button>
+        </div>
+      </section>
+
+      <section class="task-area">
+        <div id="taskGroups"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="taskDialog" class="task-dialog">
+    <form method="dialog" id="taskForm">
+      <div class="dialog-head">
+        <h3 id="dialogTitle">Task details</h3>
+        <button class="ghost-btn" value="cancel">✕</button>
+      </div>
+      <div class="dialog-grid">
+        <label>Bed number
+          <input id="formBed" type="text" inputmode="numeric" placeholder="e.g. 12" />
+        </label>
+        <label>Task
+          <input id="formText" type="text" placeholder="Task description" required />
+        </label>
+        <label>Category
+          <select id="formCategory"></select>
+        </label>
+        <label>Priority
+          <select id="formPriority"></select>
+        </label>
+        <label>Status
+          <select id="formStatus"></select>
+        </label>
+        <label>Waiting on
+          <input id="formWaitingOn" type="text" placeholder="e.g. radiology, reg, pharmacy" />
+        </label>
+        <label class="full">Note
+          <textarea id="formNote" rows="4" placeholder="Optional short note"></textarea>
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button value="cancel" class="ghost-btn" type="button" id="cancelTaskBtn">Cancel</button>
+        <button id="saveTaskBtn" class="primary-btn" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="handoverDialog" class="task-dialog">
+    <div class="dialog-head">
+      <h3>Handover summary</h3>
+      <button class="ghost-btn" id="closeHandoverBtn">✕</button>
     </div>
-    <div class="sub" id="todayLabel"></div>
-  </div>
-</div>
+    <p class="muted" style="padding: 0 14px;">Plain text, bed-based, non-identifying summary of open tasks.</p>
+    <textarea id="handoverText" rows="16" readonly style="margin: 0 14px 14px 14px; width: calc(100% - 28px);"></textarea>
+    <div class="dialog-actions">
+      <button id="copyHandoverBtn" class="primary-btn">Copy summary</button>
+    </div>
+  </dialog>
 
-<div class="app">
-  <div class="notice"><strong>Keep it de-identified.</strong> Use initials, bed number, team labels. No full names, UR numbers, DOB, or anything your service would hate you storing.</div>
+  <div id="toast" class="toast" aria-live="polite"></div>
 
-  <div class="statbar">
-    <div class="stat"><div class="stat-num" id="mPatients">0</div><div class="stat-lbl">Patients</div></div>
-    <div class="stat"><div class="stat-num" id="mPending">0</div><div class="stat-lbl">Jobs left</div></div>
-    <div class="stat"><div class="stat-num" id="mUrgent">0</div><div class="stat-lbl">Urgent</div></div>
-  </div>
+  <script>
+const APP_KEY = 'wardflow-v1';
+const THEME_KEY = 'wardflow-theme';
+const TEMPLATES_KEY = 'wardflow-templates';
 
-  <div class="layout">
-    <section class="card">
-      <div class="card-head">
-        <div>
-          <div class="section-title" style="margin:0">Patients</div>
-          <div class="small">Tap one to focus</div>
-        </div>
-        <button class="btn primary" onclick="openPatientModal()">Add</button>
+const PRIORITY_ORDER = { Critical: 0, Urgent: 1, Soon: 2, Routine: 3 };
+const STATUS_ORDER = ['New', 'Next', 'In Progress', 'Waiting', 'Done'];
+const CATEGORIES = ['Review', 'Investigation', 'Medication', 'Procedure', 'Documentation', 'Referral', 'Communication', 'Admin', 'Other'];
+const PRIORITIES = ['Critical', 'Urgent', 'Soon', 'Routine'];
+const DEFAULT_TEMPLATES = [
+  'Bloods', 'Cannula', 'ECG', 'Rewrite chart', 'Discharge summary', 'TTO / meds',
+  'Imaging chase', 'Review patient', 'Call senior', 'Call family', 'Fluid review',
+  'Check result', 'Referral', 'Notes / documentation'
+];
+
+const state = {
+  tasks: [],
+  filter: 'Open',
+  view: 'All tasks',
+  sort: 'priority-newest',
+  search: '',
+  editId: null,
+  undoStack: [],
+  templates: loadTemplates(),
+};
+
+const els = {
+  dateTime: document.getElementById('dateTime'),
+  quickInput: document.getElementById('quickInput'),
+  addBtn: document.getElementById('addBtn'),
+  voiceBtn: document.getElementById('voiceBtn'),
+  parseHint: document.getElementById('parseHint'),
+  templateRow: document.getElementById('templateRow'),
+  countsGrid: document.getElementById('countsGrid'),
+  nextFive: document.getElementById('nextFive'),
+  statusFilters: document.getElementById('statusFilters'),
+  viewModes: document.getElementById('viewModes'),
+  searchInput: document.getElementById('searchInput'),
+  sortMode: document.getElementById('sortMode'),
+  taskGroups: document.getElementById('taskGroups'),
+  themeToggle: document.getElementById('themeToggle'),
+  taskDialog: document.getElementById('taskDialog'),
+  taskForm: document.getElementById('taskForm'),
+  formBed: document.getElementById('formBed'),
+  formText: document.getElementById('formText'),
+  formCategory: document.getElementById('formCategory'),
+  formPriority: document.getElementById('formPriority'),
+  formStatus: document.getElementById('formStatus'),
+  formWaitingOn: document.getElementById('formWaitingOn'),
+  formNote: document.getElementById('formNote'),
+  cancelTaskBtn: document.getElementById('cancelTaskBtn'),
+  saveTaskBtn: document.getElementById('saveTaskBtn'),
+  dialogTitle: document.getElementById('dialogTitle'),
+  handoverBtn: document.getElementById('handoverBtn'),
+  handoverDialog: document.getElementById('handoverDialog'),
+  handoverText: document.getElementById('handoverText'),
+  copyHandoverBtn: document.getElementById('copyHandoverBtn'),
+  closeHandoverBtn: document.getElementById('closeHandoverBtn'),
+  clearDoneBtn: document.getElementById('clearDoneBtn'),
+  toast: document.getElementById('toast'),
+};
+
+function nowIso() { return new Date().toISOString(); }
+function relativeTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.round(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.round(hrs / 24)}d ago`;
+}
+function safeText(s) { return String(s || '').replace(/[<>]/g, ''); }
+function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+function showToast(text) {
+  els.toast.textContent = text;
+  els.toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => els.toast.classList.remove('show'), 1800);
+}
+
+function save() {
+  localStorage.setItem(APP_KEY, JSON.stringify(state.tasks));
+}
+function load() {
+  try { state.tasks = JSON.parse(localStorage.getItem(APP_KEY) || '[]'); }
+  catch { state.tasks = []; }
+}
+function loadTemplates() {
+  try { return JSON.parse(localStorage.getItem(TEMPLATES_KEY) || 'null') || DEFAULT_TEMPLATES; }
+  catch { return DEFAULT_TEMPLATES; }
+}
+function saveTemplates() {
+  localStorage.setItem(TEMPLATES_KEY, JSON.stringify(state.templates));
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem(THEME_KEY, theme);
+}
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved) return setTheme(saved);
+  const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(dark ? 'dark' : 'light');
+}
+
+function inferCategory(text) {
+  const t = text.toLowerCase();
+  if (/(review|pain|unwell|assess|see patient|fluid review)/.test(t)) return 'Review';
+  if (/(blood|ecg|ct|mri|xr|xray|uss|ultrasound|imaging|result|culture|swab|scan|chase)/.test(t)) return 'Investigation';
+  if (/(med|drug|tto|chart|rewrite chart|prescribe|analgesia|antibiotic)/.test(t)) return 'Medication';
+  if (/(cannula|iv|catheter|ngt|abg|venepuncture|procedure)/.test(t)) return 'Procedure';
+  if (/(discharge summary|summary|documentation|document|notes|letter)/.test(t)) return 'Documentation';
+  if (/(referral|consult|liaise)/.test(t)) return 'Referral';
+  if (/(call|family|discuss|speak to|update)/.test(t)) return 'Communication';
+  if (/(admin|form|transport|book|follow up|handover)/.test(t)) return 'Admin';
+  return 'Other';
+}
+
+function inferPriority(text) {
+  const t = text.toLowerCase();
+  if (/(stat|now|urgent|asap|critical|unwell|rapid|deteriorat|call senior now)/.test(t)) return 'Critical';
+  if (/(review|chase|today|discharge today|pain|family upset|new fever|low bp|tachy|hypo)/.test(t)) return 'Urgent';
+  if (/(before lunch|this morning|this afternoon|check result|referral|rewrite chart|tto)/.test(t)) return 'Soon';
+  return 'Routine';
+}
+
+function inferStatus(text) {
+  const t = text.toLowerCase();
+  if (/(waiting|await|pending|chase result|for radiology|for pharmacy)/.test(t)) return 'Waiting';
+  if (/(doing|in progress|started)/.test(t)) return 'In Progress';
+  if (/(next)/.test(t)) return 'Next';
+  return 'New';
+}
+
+function extractBed(input) {
+  const bedMatch = input.match(/\b(?:bed|b)\s*(\d{1,3})\b/i) || input.match(/^(\d{1,3})\b/);
+  return bedMatch ? bedMatch[1] : '';
+}
+
+function cleanTaskText(input, bed) {
+  let text = input.replace(/\b(?:bed|b)\s*\d{1,3}\b/i, '').trim();
+  if (!text && bed) text = 'General task';
+  return text.replace(/^[-:,.\\s]+/, '').trim();
+}
+
+function parseQuickEntry(raw) {
+  const input = safeText(raw).trim();
+  const bed = extractBed(input);
+  const text = cleanTaskText(input, bed) || input;
+  const category = inferCategory(text);
+  const priority = inferPriority(text);
+  const status = inferStatus(text);
+  const ambiguous = !bed || text.length < 3;
+  return { bed, text, category, priority, status, ambiguous };
+}
+
+function makeTask(parsed, overrides = {}) {
+  const createdAt = nowIso();
+  return {
+    id: uid(),
+    bed: parsed.bed || '',
+    text: parsed.text,
+    category: parsed.category,
+    priority: parsed.priority,
+    suggestedPriority: parsed.priority,
+    status: parsed.status,
+    note: '',
+    waitingOn: '',
+    createdAt,
+    updatedAt: createdAt,
+    completedAt: null,
+    statusHistory: [{ status: parsed.status, at: createdAt }],
+    ...overrides,
+  };
+}
+
+function addTaskFromInput() {
+  const raw = els.quickInput.value.trim();
+  if (!raw) return;
+  const parsed = parseQuickEntry(raw);
+  const task = makeTask(parsed);
+  state.tasks.unshift(task);
+  save();
+  els.quickInput.value = '';
+  els.parseHint.textContent = parsed.ambiguous
+    ? 'Added, but details may be incomplete. Tap edit if needed.'
+    : `Added: Bed ${task.bed || '?'}, ${task.category}, ${task.priority}`;
+  showToast('Task added');
+  render();
+}
+
+function updateDateTime() {
+  els.dateTime.textContent = new Intl.DateTimeFormat([], {
+    weekday: 'long', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'
+  }).format(new Date());
+}
+
+function priorityClass(p) { return `p-${p.toLowerCase()}`; }
+function taskCardClass(task) {
+  return `task-card priority-${task.priority.toLowerCase()} ${task.status === 'Done' ? 'done' : ''} ${isOverdue(task) ? 'overdue' : ''}`;
+}
+
+function isOverdue(task) {
+  if (task.status === 'Done') return false;
+  const ageMins = (Date.now() - new Date(task.updatedAt).getTime()) / 60000;
+  if (task.priority === 'Critical') return ageMins > 30;
+  if (task.priority === 'Urgent') return ageMins > 120;
+  if (task.status === 'Waiting') return ageMins > 180;
+  return false;
+}
+
+function taskWeight(task) {
+  let score = PRIORITY_ORDER[task.priority] * 1000000;
+  if (task.status === 'Done') score += 100000000;
+  if (task.status === 'Waiting') score += 200000;
+  if (task.status === 'In Progress') score -= 100000;
+  if (task.status === 'Next') score -= 150000;
+  score += (Date.now() - new Date(task.createdAt).getTime()) / 1000;
+  return score;
+}
+
+function getVisibleTasks() {
+  let tasks = [...state.tasks];
+  const f = state.filter;
+  if (f === 'Open') tasks = tasks.filter(t => t.status !== 'Done');
+  if (f === 'In Progress') tasks = tasks.filter(t => t.status === 'In Progress');
+  if (f === 'Waiting') tasks = tasks.filter(t => t.status === 'Waiting');
+  if (f === 'Done') tasks = tasks.filter(t => t.status === 'Done');
+  if (f === 'Urgent only') tasks = tasks.filter(t => ['Critical', 'Urgent'].includes(t.priority) && t.status !== 'Done');
+  if (state.search.trim()) {
+    const q = state.search.trim().toLowerCase();
+    tasks = tasks.filter(t => (t.bed || '').toLowerCase().includes(q) || t.text.toLowerCase().includes(q) || (t.note || '').toLowerCase().includes(q));
+  }
+  tasks.sort((a, b) => sortTasks(a, b, state.sort));
+  return tasks;
+}
+
+function sortTasks(a, b, mode) {
+  if (mode === 'bed') return String(a.bed).localeCompare(String(b.bed), undefined, { numeric: true }) || taskWeight(a) - taskWeight(b);
+  if (mode === 'updated') return new Date(b.updatedAt) - new Date(a.updatedAt);
+  if (mode === 'priority-oldest') {
+    return PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority] || new Date(a.createdAt) - new Date(b.createdAt);
+  }
+  return PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority] || new Date(b.createdAt) - new Date(a.createdAt);
+}
+
+function counts() {
+  const open = state.tasks.filter(t => t.status !== 'Done').length;
+  const done = state.tasks.filter(t => t.status === 'Done').length;
+  const waiting = state.tasks.filter(t => t.status === 'Waiting').length;
+  const progress = state.tasks.filter(t => t.status === 'In Progress').length;
+  const critical = state.tasks.filter(t => t.priority === 'Critical' && t.status !== 'Done').length;
+  const urgent = state.tasks.filter(t => t.priority === 'Urgent' && t.status !== 'Done').length;
+  return { open, done, waiting, progress, critical, urgent };
+}
+
+function renderCounts() {
+  const c = counts();
+  const items = [
+    ['Open', c.open], ['Critical', c.critical], ['Urgent', c.urgent],
+    ['In progress', c.progress], ['Waiting', c.waiting], ['Done', c.done]
+  ];
+  els.countsGrid.innerHTML = items.map(([label, num]) => `
+    <div class="count-box"><div class="num">${num}</div><div class="muted">${label}</div></div>
+  `).join('');
+}
+
+function renderNextFive() {
+  const next = state.tasks
+    .filter(t => t.status !== 'Done' && t.status !== 'Waiting')
+    .sort((a, b) => taskWeight(a) - taskWeight(b))
+    .slice(0, 5);
+  if (!next.length) {
+    els.nextFive.innerHTML = '<div class="muted">No actionable tasks.</div>';
+    return;
+  }
+  els.nextFive.innerHTML = next.map(t => `
+    <div class="next-item" data-id="${t.id}">
+      <div class="bed-badge">Bed ${t.bed || '?'}</div>
+      <div>
+        <div><strong>${escapeHtml(t.text)}</strong></div>
+        <div class="muted">${t.category} · ${t.priority} · ${t.status}</div>
       </div>
-      <div class="card-body">
-        <input class="search" id="searchBox" placeholder="Search by initials, bed, team" oninput="render()" />
-        <div class="filter-row">
-          <button class="filter active" id="filter-all" onclick="setFilter('all')">All</button>
-          <button class="filter" id="filter-sick" onclick="setFilter('sick')">Sick / watch</button>
-          <button class="filter" id="filter-jobs" onclick="setFilter('jobs')">Has jobs</button>
-          <button class="filter" id="filter-discharge" onclick="setFilter('discharge')">Discharge</button>
-        </div>
-        <div class="stack" id="patientList"></div>
+      <button class="mini-btn" data-action="focus" data-id="${t.id}">Open</button>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>\"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function renderTemplates() {
+  els.templateRow.innerHTML = state.templates.map((t, i) => `
+    <button class="template-chip" data-template="${escapeHtml(t)}" title="Tap to add template. Double tap to rename.">${escapeHtml(t)}</button>
+  `).join('') + '<button class="template-chip" id="editTemplatesBtn">Edit templates</button>';
+
+  els.templateRow.querySelectorAll('[data-template]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const current = els.quickInput.value.trim();
+      const needsSpace = current && !current.endsWith(' ');
+      els.quickInput.value = `${current}${needsSpace ? ' ' : ''}${btn.dataset.template}`.trim();
+      els.quickInput.focus();
+      previewParse();
+    });
+    btn.addEventListener('dblclick', () => {
+      const next = prompt('Rename template', btn.dataset.template);
+      if (!next) return;
+      state.templates[i] = next.trim();
+      saveTemplates();
+      renderTemplates();
+    });
+  });
+  document.getElementById('editTemplatesBtn').onclick = editTemplates;
+}
+
+function editTemplates() {
+  const raw = prompt('Edit templates as comma-separated items', state.templates.join(', '));
+  if (raw == null) return;
+  const list = raw.split(',').map(s => s.trim()).filter(Boolean).slice(0, 24);
+  if (!list.length) return;
+  state.templates = list;
+  saveTemplates();
+  renderTemplates();
+  showToast('Templates updated');
+}
+
+function renderFilters() {
+  const filters = ['All', 'Open', 'In Progress', 'Waiting', 'Done', 'Urgent only'];
+  els.statusFilters.innerHTML = filters.map(f => `<button class="chip ${state.filter === f ? 'active' : ''}" data-filter="${f}">${f}</button>`).join('');
+  els.statusFilters.querySelectorAll('[data-filter]').forEach(btn => btn.onclick = () => { state.filter = btn.dataset.filter; render(); });
+
+  const views = ['All tasks', 'By bed', 'By priority', 'By category', 'My next actions'];
+  els.viewModes.innerHTML = views.map(v => `<button class="chip ${state.view === v ? 'active' : ''}" data-view="${v}">${v}</button>`).join('');
+  els.viewModes.querySelectorAll('[data-view]').forEach(btn => btn.onclick = () => { state.view = btn.dataset.view; render(); });
+}
+
+function buildGroups(tasks) {
+  if (state.view === 'My next actions') {
+    return { 'My next actions': tasks.filter(t => ['New', 'Next', 'In Progress'].includes(t.status) && t.status !== 'Done').slice(0, 20) };
+  }
+  if (state.view === 'By bed') return groupBy(tasks, t => `Bed ${t.bed || '?'}`);
+  if (state.view === 'By priority') return groupBy(tasks, t => t.priority);
+  if (state.view === 'By category') return groupBy(tasks, t => t.category);
+  const open = tasks.filter(t => t.status !== 'Done');
+  const done = tasks.filter(t => t.status === 'Done');
+  return { 'Open tasks': open, 'Completed': done };
+}
+
+function groupBy(items, fn) {
+  return items.reduce((acc, item) => {
+    const key = fn(item);
+    (acc[key] ||= []).push(item);
+    return acc;
+  }, {});
+}
+
+function statusButtons(task) {
+  return STATUS_ORDER.filter(s => s !== task.status).map(s => `<button class="mini-btn" data-action="status" data-value="${s}" data-id="${task.id}">${s}</button>`).join('');
+}
+
+function renderTaskGroups() {
+  const tasks = getVisibleTasks();
+  const groups = buildGroups(tasks);
+  const parts = Object.entries(groups).map(([title, list]) => `
+    <div class="group-card card">
+      <h3 class="group-title">${escapeHtml(title)} ${list.length ? `<span class="muted">(${list.length})</span>` : ''}</h3>
+      <div class="task-list">
+        ${list.length ? list.map(renderTaskCard).join('') : '<div class="muted">Nothing here.</div>'}
       </div>
-    </section>
+    </div>
+  `);
+  els.taskGroups.innerHTML = parts.join('');
+  bindTaskActions();
+}
 
-    <section class="card">
-      <div class="card-head">
-        <div>
-          <div class="section-title" style="margin:0">Focus patient</div>
-          <div class="small" id="detailSubtitle">Select a patient</div>
+function renderTaskCard(task) {
+  const bed = task.bed ? `Bed ${escapeHtml(task.bed)}` : 'Bed ?';
+  const note = task.note ? `<div class="task-note">${escapeHtml(task.note)}</div>` : '';
+  const waiting = task.waitingOn ? `<span class="pill p-waiting">Waiting on ${escapeHtml(task.waitingOn)}</span>` : '';
+  const overdue = isOverdue(task) ? `<span class="pill p-critical">Overdue follow-up</span>` : '';
+  return `
+    <article class="${taskCardClass(task)}" id="task-${task.id}">
+      <div class="task-top">
+        <label class="check-wrap"><input class="task-check" type="checkbox" ${task.status === 'Done' ? 'checked' : ''} data-action="toggle-done" data-id="${task.id}" /></label>
+        <div class="task-main">
+          <div class="task-title">
+            <span class="bed-badge">${bed}</span>
+            <span>${escapeHtml(task.text)}</span>
+          </div>
+          <div class="task-meta">
+            <span class="pill">${escapeHtml(task.category)}</span>
+            <span class="pill ${priorityClass(task.priority)}">${escapeHtml(task.priority)}</span>
+            <span class="pill ${task.status === 'Done' ? 'p-done' : ''}">${escapeHtml(task.status)}</span>
+            ${waiting}
+            ${overdue}
+          </div>
+          <div class="task-times">Added ${relativeTime(task.createdAt)} · Updated ${relativeTime(task.updatedAt)}</div>
+          ${note}
         </div>
-        <div class="row wrap">
-          <button class="btn soft" onclick="openExportModal()">Backup</button>
-          <button class="btn" id="editPatientBtn" onclick="editActivePatient()" disabled>Edit</button>
+        <div class="task-actions">
+          <button class="mini-btn" data-action="edit" data-id="${task.id}">Edit</button>
+          <button class="mini-btn" data-action="bump" data-id="${task.id}">↑ Priority</button>
+          <button class="mini-btn" data-action="note" data-id="${task.id}">Note</button>
+          <button class="mini-btn" data-action="delete" data-id="${task.id}">Delete</button>
         </div>
       </div>
-      <div class="card-body" id="detailPane"></div>
-    </section>
-  </div>
-</div>
-
-<div class="footerbar">
-  <div class="footer-inner">
-    <button class="btn primary" onclick="openPatientModal()">+ Patient</button>
-    <button class="btn" onclick="openQuickJobModal()">+ Job</button>
-    <button class="btn danger" onclick="clearDoneJobs()">Clear done</button>
-  </div>
-</div>
-
-<div class="modal-wrap" id="modalWrap" onclick="closeModal(event)"><div class="modal" id="modalBox"></div></div>
-
-<script>
-const STORAGE_KEY='ward_jobs_minimal_v2';
-const QUICK_JOBS=['Chase bloods','Review obs','Update family','Call consult','Scan booked?','Discharge summary','Discharge script','Physio review','OT review','Repeat ECG'];
-let state={patients:[],activeId:null,filter:'all'};
-
-function uid(){return Math.random().toString(36).slice(2,10)}
-function nowLabel(){return new Date().toLocaleString([], {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}
-function save(){localStorage.setItem(STORAGE_KEY, JSON.stringify(state))}
-function load(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw) state=JSON.parse(raw)}catch(e){} if(!Array.isArray(state.patients)) state.patients=[]}
-function mkJob(text,urgent=false){return{id:uid(),text,urgent,done:false,created:nowLabel()}}
-function getActive(){return state.patients.find(p=>p.id===state.activeId)||null}
-function pending(p){return p.jobs.filter(j=>!j.done).length}
-function urgentCount(p){return p.jobs.filter(j=>!j.done&&j.urgent).length}
-function setFilter(v){state.filter=v;render()}
-function esc(s){return String(s||'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
-function escAttr(s){return esc(s).replace(/'/g,'&#39;')}
-function nl2br(s){return esc(s).replace(/\n/g,'<br>')}
-
-function seed(){
- if(state.patients.length) return;
- const a={id:uid(),alias:'J.S.',bed:'12A',team:'Med A',status:'stable',dischargeLikely:true,problems:'CAP, AKI improving',plan:'IVAB, wean O2, bloods, mobilise',notes:'Possible discharge tomorrow.',jobs:[mkJob('Chase morning bloods'),mkJob('Call son with update',true)],reviewedToday:false};
- const b={id:uid(),alias:'M.K.',bed:'7C',team:'Med B',status:'watch',dischargeLikely:false,problems:'CCF, AF',plan:'Diurese, fluid balance, echo',notes:'Borderline BP overnight.',jobs:[mkJob('Echo booked?',true)],reviewedToday:false};
- state.patients=[a,b]; state.activeId=a.id; save();
+      <div class="status-row">${statusButtons(task)}</div>
+    </article>
+  `;
 }
 
-function renderMetrics(){
- const jobs=state.patients.flatMap(p=>p.jobs);
- document.getElementById('mPatients').textContent=state.patients.length;
- document.getElementById('mPending').textContent=jobs.filter(j=>!j.done).length;
- document.getElementById('mUrgent').textContent=jobs.filter(j=>!j.done&&j.urgent).length;
+function bindTaskActions() {
+  document.querySelectorAll('[data-action]').forEach(el => {
+    el.onclick = () => handleAction(el.dataset.action, el.dataset.id, el.dataset.value || null);
+  });
 }
 
-function filteredPatients(){
- const q=(document.getElementById('searchBox')?.value||'').trim().toLowerCase();
- return state.patients.filter(p=>{
-   const search=!q||[p.alias,p.bed,p.team,p.problems].join(' ').toLowerCase().includes(q);
-   let f=true;
-   if(state.filter==='sick') f=p.status==='sick'||p.status==='watch';
-   if(state.filter==='jobs') f=pending(p)>0;
-   if(state.filter==='discharge') f=!!p.dischargeLikely;
-   return search&&f;
- })
+function handleAction(action, id, value) {
+  const task = state.tasks.find(t => t.id === id);
+  if (!task) return;
+  if (action === 'toggle-done') {
+    if (task.status === 'Done') {
+      setStatus(task, 'New');
+      task.completedAt = null;
+      pushUndo(`Undid completion for Bed ${task.bed || '?'}`);
+      showToast('Completion undone');
+    } else {
+      setStatus(task, 'Done');
+      task.completedAt = nowIso();
+      pushUndo(`Completed Bed ${task.bed || '?'} task`, () => {
+        setStatus(task, 'New');
+        task.completedAt = null;
+        save();
+        render();
+      });
+      showToast('Task completed');
+    }
+    save(); render(); return;
+  }
+  if (action === 'status') { setStatus(task, value); save(); render(); return; }
+  if (action === 'edit') return openEdit(task);
+  if (action === 'bump') {
+    const ix = PRIORITIES.indexOf(task.priority);
+    if (ix > 0) task.priority = PRIORITIES[ix - 1];
+    task.updatedAt = nowIso(); save(); render(); showToast('Priority raised'); return;
+  }
+  if (action === 'note') {
+    const note = prompt('Quick note', task.note || '');
+    if (note === null) return;
+    task.note = safeText(note);
+    task.updatedAt = nowIso(); save(); render(); showToast('Note saved'); return;
+  }
+  if (action === 'delete') {
+    if (!confirm('Delete this task?')) return;
+    const snapshot = structuredClone(task);
+    state.tasks = state.tasks.filter(t => t.id !== id);
+    pushUndo('Task deleted', () => { state.tasks.unshift(snapshot); save(); render(); });
+    save(); render(); showToast('Task deleted'); return;
+  }
+  if (action === 'focus') {
+    document.getElementById(`task-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
-function statusChip(status){
- if(status==='sick') return '<span class="chip red">Sick</span>';
- if(status==='watch') return '<span class="chip amber">Watch</span>';
- return '<span class="chip green">Stable</span>';
+function setStatus(task, status) {
+  task.status = status;
+  task.updatedAt = nowIso();
+  task.statusHistory.push({ status, at: task.updatedAt });
 }
 
-function renderPatientList(){
- ['all','sick','jobs','discharge'].forEach(f=>document.getElementById('filter-'+f)?.classList.toggle('active',state.filter===f));
- const wrap=document.getElementById('patientList');
- const pts=filteredPatients();
- if(!pts.length){wrap.innerHTML='<div class="empty">No patients match that filter.</div>';return}
- wrap.innerHTML=pts.map(p=>`<div class="patient ${p.id===state.activeId?'active':''}" onclick="selectPatient('${p.id}')">
-   <div class="patient-top">
-     <div>
-       <div class="patient-name">${esc(p.alias||'Unnamed')}</div>
-       <div class="patient-meta">Bed ${esc(p.bed||'-')} · ${esc(p.team||'-')}</div>
-     </div>
-     ${statusChip(p.status)}
-   </div>
-   <div class="chips">
-     <span class="chip blue">${pending(p)} jobs</span>
-     ${urgentCount(p)?`<span class="chip red">${urgentCount(p)} urgent</span>`:''}
-     ${p.dischargeLikely?'<span class="chip green">Discharge</span>':''}
-     ${p.reviewedToday?'<span class="chip amber">WR done</span>':''}
-   </div>
-   <div class="small">${esc((p.problems||'').slice(0,90)||'No summary yet')}</div>
- </div>`).join('');
+function pushUndo(label, fn = null) {
+  state.undoStack.unshift({ label, fn, at: Date.now() });
+  state.undoStack = state.undoStack.slice(0, 5);
 }
 
-function renderDetail(){
- const p=getActive();
- const pane=document.getElementById('detailPane');
- const edit=document.getElementById('editPatientBtn');
- edit.disabled=!p;
- document.getElementById('todayLabel').textContent=nowLabel();
- if(!p){
-   document.getElementById('detailSubtitle').textContent='Select a patient';
-   pane.innerHTML='<div class="empty">Pick a patient from the left.</div>';
-   return;
- }
- document.getElementById('detailSubtitle').textContent=`Bed ${p.bed||'-'} · ${p.team||'-'}`;
- pane.innerHTML=`
-   <div class="hero">
-     <div class="hero-top">
-       <div>
-         <div class="hero-name">${esc(p.alias||'Unnamed')}</div>
-         <div class="hero-sub">Bed ${esc(p.bed||'-')} · ${esc(p.team||'-')}</div>
-       </div>
-       <div class="chips">
-         ${statusChip(p.status)}
-         ${p.dischargeLikely?'<span class="chip green">Discharge likely</span>':''}
-         <span class="chip blue">${pending(p)} jobs left</span>
-       </div>
-     </div>
-
-     <div class="grid-2">
-       <div class="summary-box">
-         <div class="section-title">Problem list</div>
-         <div>${(p.problems&&nl2br(p.problems))||'<span class="small">None added</span>'}</div>
-       </div>
-       <div class="summary-box">
-         <div class="section-title">Plan today</div>
-         <div>${(p.plan&&nl2br(p.plan))||'<span class="small">None added</span>'}</div>
-       </div>
-     </div>
-
-     <div>
-       <div class="row wrap" style="justify-content:space-between;margin-bottom:8px">
-         <div class="section-title" style="margin:0">Jobs</div>
-         <div class="row wrap">
-           <button class="btn soft" onclick="toggleReviewed()">${p.reviewedToday?'Ward round done':'Mark WR done'}</button>
-         </div>
-       </div>
-       <div class="quick-jobs" style="margin-bottom:10px">${QUICK_JOBS.map(q=>`<button class="quick" onclick="addQuickJob('${escAttr(q)}')">${esc(q)}</button>`).join('')}</div>
-       <div class="row wrap" style="margin-bottom:10px">
-         <input id="newJobText" placeholder="Type a new job" style="flex:1;min-width:220px">
-         <label class="small" style="display:flex;align-items:center;gap:6px;padding:0 6px"><input type="checkbox" id="newJobUrgent" style="width:auto"> urgent</label>
-         <button class="btn primary" onclick="addCustomJob()">Add job</button>
-       </div>
-       <div class="list">${renderJobs(p)}</div>
-     </div>
-
-     <div>
-       <div class="section-title">Notes</div>
-       <textarea onchange="updateField('notes',this.value)" placeholder="Overnight events, reminders, family updates">${esc(p.notes||'')}</textarea>
-     </div>
-
-     <div class="row wrap">
-       <button class="btn" onclick="movePatient(-1)">Previous</button>
-       <button class="btn" onclick="movePatient(1)">Next</button>
-       <button class="btn danger" onclick="deleteActivePatient()">Delete patient</button>
-     </div>
-   </div>`;
+function openEdit(task) {
+  state.editId = task.id;
+  els.dialogTitle.textContent = 'Edit task';
+  els.formBed.value = task.bed;
+  els.formText.value = task.text;
+  els.formCategory.value = task.category;
+  els.formPriority.value = task.priority;
+  els.formStatus.value = task.status;
+  els.formWaitingOn.value = task.waitingOn || '';
+  els.formNote.value = task.note || '';
+  els.taskDialog.showModal();
 }
 
-function renderJobs(p){
- if(!p.jobs.length) return '<div class="empty">No jobs yet.</div>';
- const ordered=[...p.jobs].sort((a,b)=>Number(a.done)-Number(b.done)||Number(b.urgent)-Number(a.urgent));
- return ordered.map(j=>`<div class="job ${j.urgent&&!j.done?'urgent':''} ${j.done?'done':''}">
-   <button class="tick ${j.done?'done':''}" onclick="toggleJob('${p.id}','${j.id}')">${j.done?'✓':''}</button>
-   <div class="job-main">
-     <div class="job-text">${esc(j.text)}</div>
-     <div class="job-meta">${esc(j.created||'')} ${j.urgent?'· urgent':''}</div>
-   </div>
-   <div class="job-actions">
-     ${!j.done?`<button class="linkish" onclick="toggleUrgent('${p.id}','${j.id}')">${j.urgent?'unflag':'urgent'}</button>`:''}
-     <button class="linkish red" onclick="removeJob('${p.id}','${j.id}')">delete</button>
-   </div>
- </div>`).join('');
+function saveForm(e) {
+  e.preventDefault();
+  const payload = {
+    bed: safeText(els.formBed.value.trim()),
+    text: safeText(els.formText.value.trim()),
+    category: els.formCategory.value,
+    priority: els.formPriority.value,
+    status: els.formStatus.value,
+    waitingOn: safeText(els.formWaitingOn.value.trim()),
+    note: safeText(els.formNote.value.trim()),
+  };
+  if (!payload.text) return;
+  if (state.editId) {
+    const task = state.tasks.find(t => t.id === state.editId);
+    Object.assign(task, payload, { updatedAt: nowIso() });
+    task.statusHistory.push({ status: task.status, at: task.updatedAt });
+    showToast('Task saved');
+  } else {
+    const task = makeTask(payload, payload);
+    state.tasks.unshift(task);
+    showToast('Task created');
+  }
+  save();
+  els.taskDialog.close();
+  render();
 }
 
-function render(){renderMetrics();renderPatientList();renderDetail();save()}
-function selectPatient(id){state.activeId=id;render()}
-function toggleReviewed(){const p=getActive();if(!p)return;p.reviewedToday=!p.reviewedToday;render()}
-function updateField(f,v){const p=getActive();if(!p)return;p[f]=v;save()}
-function addQuickJob(text){const p=getActive();if(!p)return;p.jobs.unshift(mkJob(text,false));render()}
-function addCustomJob(){const p=getActive();if(!p)return;const text=(document.getElementById('newJobText').value||'').trim();if(!text)return;const urgent=document.getElementById('newJobUrgent').checked;p.jobs.unshift(mkJob(text,urgent));document.getElementById('newJobText').value='';document.getElementById('newJobUrgent').checked=false;render()}
-function toggleJob(pid,jid){const p=state.patients.find(x=>x.id===pid);if(!p)return;const j=p.jobs.find(x=>x.id===jid);if(!j)return;j.done=!j.done;render()}
-function toggleUrgent(pid,jid){const p=state.patients.find(x=>x.id===pid);if(!p)return;const j=p.jobs.find(x=>x.id===jid);if(!j)return;j.urgent=!j.urgent;render()}
-function removeJob(pid,jid){const p=state.patients.find(x=>x.id===pid);if(!p)return;p.jobs=p.jobs.filter(j=>j.id!==jid);render()}
-function clearDoneJobs(){state.patients.forEach(p=>p.jobs=p.jobs.filter(j=>!j.done));render()}
-function movePatient(dir){const i=state.patients.findIndex(p=>p.id===state.activeId);const n=i+dir;if(n>=0&&n<state.patients.length){state.activeId=state.patients[n].id;render()}}
-
-function openPatientModal(editId=null){
- const p=editId?state.patients.find(x=>x.id===editId):null;
- modal(`<div class="stack">
-   <div><div class="hero-name" style="font-size:24px">${p?'Edit patient':'Add patient'}</div><div class="small">Keep it de-identified.</div></div>
-   <div class="grid-2">
-     <div><div class="small">Initials / alias</div><input id="fAlias" value="${escAttr(p?.alias||'')}" placeholder="J.S."></div>
-     <div><div class="small">Bed</div><input id="fBed" value="${escAttr(p?.bed||'')}" placeholder="12A"></div>
-   </div>
-   <div class="grid-2">
-     <div><div class="small">Team</div><input id="fTeam" value="${escAttr(p?.team||'')}" placeholder="Med A"></div>
-     <div><div class="small">Status</div><select id="fStatus"><option value="stable">Stable</option><option value="watch">Watch</option><option value="sick">Sick</option></select></div>
-   </div>
-   <label class="small" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="fDischarge" style="width:auto"> likely discharge</label>
-   <div><div class="small">Problem list</div><textarea id="fProblems" placeholder="CAP, AKI, falls">${esc(p?.problems||'')}</textarea></div>
-   <div><div class="small">Plan today</div><textarea id="fPlan" placeholder="Main treatment plan and jobs">${esc(p?.plan||'')}</textarea></div>
-   <div><div class="small">Notes</div><textarea id="fNotes" placeholder="Short notes">${esc(p?.notes||'')}</textarea></div>
-   <div class="row wrap"><button class="btn primary" onclick="savePatient('${p?.id||''}')">Save</button><button class="btn" onclick="hideModal()">Cancel</button></div>
- </div>`);
- document.getElementById('fStatus').value=p?.status||'stable';
- document.getElementById('fDischarge').checked=!!p?.dischargeLikely;
+function previewParse() {
+  const raw = els.quickInput.value.trim();
+  if (!raw) {
+    els.parseHint.textContent = 'Type naturally. WardFlow will suggest bed, category, and priority.';
+    return;
+  }
+  const p = parseQuickEntry(raw);
+  els.parseHint.textContent = `Bed ${p.bed || '?'} · ${p.category} · ${p.priority} · ${p.status}${p.ambiguous ? ' · editable after add' : ''}`;
 }
 
-function savePatient(editId){
- const data={alias:val('fAlias'),bed:val('fBed'),team:val('fTeam'),status:val('fStatus'),dischargeLikely:document.getElementById('fDischarge').checked,problems:val('fProblems'),plan:val('fPlan'),notes:val('fNotes')};
- if(!data.alias.trim()) return alert('Add initials or alias');
- if(editId){Object.assign(state.patients.find(x=>x.id===editId),data)}
- else{const p={id:uid(),...data,jobs:[],reviewedToday:false};state.patients.unshift(p);state.activeId=p.id}
- hideModal();render();
+function fillSelect(select, list) {
+  select.innerHTML = list.map(v => `<option value="${v}">${v}</option>`).join('');
 }
-function editActivePatient(){const p=getActive();if(p) openPatientModal(p.id)}
-function deleteActivePatient(){const p=getActive();if(!p)return;if(!confirm('Delete this patient?'))return;state.patients=state.patients.filter(x=>x.id!==p.id);state.activeId=state.patients[0]?.id||null;render()}
-function openQuickJobModal(){const p=getActive();if(!p){alert('Select a patient first');return;}modal(`<div class="stack"><div><div class="hero-name" style="font-size:24px">Add job</div><div class="small">For ${esc(p.alias)}</div></div><input id="qjText" placeholder="e.g. chase CT result"><label class="small" style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="qjUrgent" style="width:auto"> urgent</label><div class="quick-jobs">${QUICK_JOBS.map(q=>`<button class="quick" onclick="document.getElementById('qjText').value='${escAttr(q)}'">${esc(q)}</button>`).join('')}</div><div class="row wrap"><button class="btn primary" onclick="submitQuickJob()">Add</button><button class="btn" onclick="hideModal()">Cancel</button></div></div>`)}
-function submitQuickJob(){const p=getActive();if(!p)return;const text=val('qjText').trim();if(!text)return;p.jobs.unshift(mkJob(text,document.getElementById('qjUrgent').checked));hideModal();render()}
 
-function openExportModal(){modal(`<div class="stack"><div><div class="hero-name" style="font-size:24px">Backup</div><div class="small">Export or restore local data</div></div><div class="row wrap"><button class="btn primary" onclick="exportData()">Export JSON</button><label class="btn">Import JSON<input type="file" accept="application/json" style="display:none" onchange="importData(event)"></label><button class="btn danger" onclick="wipeAllData()">Wipe all</button></div></div>`)}
-function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ward-jobs-backup-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href)}
-function importData(event){const file=event.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!Array.isArray(data.patients))throw new Error('bad');state=data;hideModal();render()}catch(e){alert('Invalid backup file')}};reader.readAsText(file)}
-function wipeAllData(){if(!confirm('Delete all local data?'))return;state={patients:[],activeId:null,filter:'all'};hideModal();render()}
+function buildHandoverSummary() {
+  const open = [...state.tasks]
+    .filter(t => t.status !== 'Done')
+    .sort((a, b) => String(a.bed).localeCompare(String(b.bed), undefined, { numeric: true }) || PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+  const grouped = groupBy(open, t => `Bed ${t.bed || '?'}`);
+  const lines = [
+    'WardFlow handover summary',
+    'Non-identifying bed-based task list only',
+    ''
+  ];
+  Object.entries(grouped).forEach(([bed, tasks]) => {
+    lines.push(`${bed}`);
+    tasks.forEach(t => {
+      const wait = t.waitingOn ? ` | waiting on ${t.waitingOn}` : '';
+      lines.push(`- [${t.priority}] ${t.text} (${t.status}, ${t.category})${wait}`);
+    });
+    lines.push('');
+  });
+  return lines.join('\n').trim();
+}
 
-function modal(html){document.getElementById('modalBox').innerHTML=html;document.getElementById('modalWrap').classList.add('show')}
-function hideModal(){document.getElementById('modalWrap').classList.remove('show')}
-function closeModal(e){if(e.target.id==='modalWrap') hideModal()}
-function val(id){return document.getElementById(id)?.value||''}
+function bindVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    els.voiceBtn.disabled = true;
+    els.voiceBtn.title = 'Voice input not supported in this browser';
+    return;
+  }
+  const rec = new SR();
+  rec.lang = 'en-AU';
+  rec.interimResults = false;
+  rec.maxAlternatives = 1;
+  els.voiceBtn.onclick = () => {
+    try { rec.start(); showToast('Listening'); } catch {}
+  };
+  rec.onresult = (e) => {
+    const text = e.results?.[0]?.[0]?.transcript || '';
+    els.quickInput.value = text;
+    previewParse();
+    showToast('Voice captured');
+  };
+}
 
-load();seed();render();
-</script>
+function clearDone() {
+  const count = state.tasks.filter(t => t.status === 'Done').length;
+  if (!count) return showToast('No completed tasks to clear');
+  if (!confirm(`Clear ${count} completed tasks?`)) return;
+  const backup = structuredClone(state.tasks.filter(t => t.status === 'Done'));
+  state.tasks = state.tasks.filter(t => t.status !== 'Done');
+  pushUndo('Cleared completed tasks', () => {
+    state.tasks = [...backup, ...state.tasks]; save(); render();
+  });
+  save(); render(); showToast('Completed tasks cleared');
+}
+
+function render() {
+  renderTemplates();
+  renderFilters();
+  renderCounts();
+  renderNextFive();
+  renderTaskGroups();
+}
+
+function init() {
+  initTheme();
+  load();
+  fillSelect(els.formCategory, CATEGORIES);
+  fillSelect(els.formPriority, PRIORITIES);
+  fillSelect(els.formStatus, STATUS_ORDER);
+  updateDateTime();
+  setInterval(updateDateTime, 30000);
+  bindVoice();
+
+  els.addBtn.onclick = addTaskFromInput;
+  els.quickInput.addEventListener('input', previewParse);
+  els.quickInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addTaskFromInput(); }
+  });
+  els.searchInput.oninput = (e) => { state.search = e.target.value; render(); };
+  els.sortMode.onchange = (e) => { state.sort = e.target.value; render(); };
+  els.taskForm.onsubmit = saveForm;
+  els.cancelTaskBtn.onclick = () => els.taskDialog.close();
+  els.themeToggle.onclick = () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  els.handoverBtn.onclick = () => { els.handoverText.value = buildHandoverSummary(); els.handoverDialog.showModal(); };
+  els.closeHandoverBtn.onclick = () => els.handoverDialog.close();
+  els.copyHandoverBtn.onclick = async () => {
+    try { await navigator.clipboard.writeText(els.handoverText.value); showToast('Summary copied'); }
+    catch { showToast('Could not copy'); }
+  };
+  els.clearDoneBtn.onclick = clearDone;
+
+  render();
+}
+
+init();
+  </script>
 </body>
 </html>
